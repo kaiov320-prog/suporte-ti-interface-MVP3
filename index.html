@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="Sistema de gerenciamento de chamados de suporte presencial de TI."
+  >
+  <title>Suporte TI | Gestão de chamados</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div>
+        <span class="eyebrow">CENTRAL DE ATENDIMENTO</span>
+        <h1>Suporte TI</h1>
+        <p>Organize e acompanhe seus chamados de suporte presencial.</p>
+      </div>
+
+      <a class="button button-primary" href="#formulario">
+        Novo chamado
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Resumo dos chamados carregados da API -->
+    <section class="summary" aria-label="Resumo dos chamados">
+      <article class="summary-card">
+        <h2>Total de chamados</h2>
+        <p id="total-chamados">—</p>
+      </article>
+
+      <article class="summary-card summary-open">
+        <h2>Abertos</h2>
+        <p id="total-abertos">—</p>
+      </article>
+
+      <article class="summary-card summary-progress">
+        <h2>Em atendimento</h2>
+        <p id="total-em-atendimento">—</p>
+      </article>
+
+      <article class="summary-card summary-done">
+        <h2>Concluídos</h2>
+        <p id="total-concluidos">—</p>
+      </article>
+    </section>
+
+    <!-- Mensagens de sucesso e erro serão inseridas pelo JavaScript -->
+    <div
+      id="mensagem"
+      class="message"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      hidden
+    ></div>
+
+    <div class="workspace">
+      <section
+        id="formulario"
+        class="panel"
+        aria-labelledby="titulo-formulario"
+      >
+        <div class="panel-heading">
+          <h2 id="titulo-formulario">Novo chamado</h2>
+          <p>Descreva o problema e informe o local do atendimento.</p>
+          <p class="form-hint">Campos com * são obrigatórios.</p>
+        </div>
+
+        <form id="form-chamado">
+          <!-- Preenchido ao selecionar um chamado para edição -->
+          <input type="hidden" id="chamado-id" name="id">
+
+          <div class="field">
+            <label for="titulo">Título *</label>
+            <input
+              type="text"
+              id="titulo"
+              name="titulo"
+              placeholder="Ex.: Impressora não conecta à rede"
+              minlength="3"
+              maxlength="120"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="descricao">Descrição *</label>
+            <textarea
+              id="descricao"
+              name="descricao"
+              rows="4"
+              placeholder="Explique o problema e seu impacto no trabalho."
+              minlength="10"
+              maxlength="2000"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="categoria">Categoria *</label>
+              <select id="categoria" name="categoria" required>
+                <option value="">Selecione</option>
+                <option value="hardware">Hardware</option>
+                <option value="software">Software</option>
+                <option value="rede">Rede</option>
+                <option value="impressora">Impressora</option>
+                <option value="outros">Outros</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="prioridade">Prioridade *</label>
+              <select id="prioridade" name="prioridade" required>
+                <option value="baixa">Baixa</option>
+                <option value="media" selected>Média</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="status">Status *</label>
+            <select id="status" name="status" required>
+              <option value="aberto">Aberto</option>
+              <option value="em_atendimento">Em atendimento</option>
+              <option value="concluido">Concluído</option>
+            </select>
+          </div>
+
+          <fieldset class="address-fields">
+            <legend>Local do atendimento</legend>
+
+            <div class="field">
+              <label for="cep">CEP *</label>
+
+              <div class="input-action">
+                <input
+                  type="text"
+                  id="cep"
+                  name="cep"
+                  placeholder="00000-000"
+                  inputmode="numeric"
+                  autocomplete="postal-code"
+                  pattern="[0-9]{5}-?[0-9]{3}"
+                  maxlength="9"
+                  aria-describedby="cep-ajuda"
+                  required
+                >
+
+                <button
+                  type="button"
+                  id="buscar-cep"
+                  class="button button-secondary"
+                >
+                  Buscar CEP
+                </button>
+              </div>
+
+              <small id="cep-ajuda">
+                Informe oito dígitos. A consulta preencherá os dados
+                de endereço disponíveis.
+              </small>
+
+              <p
+                id="cep-mensagem"
+                role="status"
+                aria-live="polite"
+              ></p>
+            </div>
+
+            <div class="field">
+              <label for="logradouro">Logradouro *</label>
+              <input
+                type="text"
+                id="logradouro"
+                name="logradouro"
+                autocomplete="address-line1"
+                maxlength="200"
+                required
+              >
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="numero">Número *</label>
+                <input
+                  type="text"
+                  id="numero"
+                  name="numero"
+                  placeholder="Ex.: 120 ou S/N"
+                  maxlength="20"
+                  required
+                >
+              </div>
+
+              <div class="field">
+                <label for="complemento">Complemento</label>
+                <input
+                  type="text"
+                  id="complemento"
+                  name="complemento"
+                  placeholder="Ex.: Sala 3"
+                  autocomplete="address-line2"
+                  maxlength="100"
+                >
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="bairro">Bairro *</label>
+              <input
+                type="text"
+                id="bairro"
+                name="bairro"
+                maxlength="100"
+                required
+              >
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="cidade">Cidade *</label>
+                <input
+                  type="text"
+                  id="cidade"
+                  name="cidade"
+                  autocomplete="address-level2"
+                  maxlength="100"
+                  required
+                >
+              </div>
+
+              <div class="field">
+                <label for="uf">UF *</label>
+                <select
+                  id="uf"
+                  name="uf"
+                  autocomplete="address-level1"
+                  required
+                >
+                  <option value="">Selecione</option>
+                  <option value="AC">AC</option>
+                  <option value="AL">AL</option>
+                  <option value="AP">AP</option>
+                  <option value="AM">AM</option>
+                  <option value="BA">BA</option>
+                  <option value="CE">CE</option>
+                  <option value="DF">DF</option>
+                  <option value="ES">ES</option>
+                  <option value="GO">GO</option>
+                  <option value="MA">MA</option>
+                  <option value="MT">MT</option>
+                  <option value="MS">MS</option>
+                  <option value="MG">MG</option>
+                  <option value="PA">PA</option>
+                  <option value="PB">PB</option>
+                  <option value="PR">PR</option>
+                  <option value="PE">PE</option>
+                  <option value="PI">PI</option>
+                  <option value="RJ">RJ</option>
+                  <option value="RN">RN</option>
+                  <option value="RS">RS</option>
+                  <option value="RO">RO</option>
+                  <option value="RR">RR</option>
+                  <option value="SC">SC</option>
+                  <option value="SP">SP</option>
+                  <option value="SE">SE</option>
+                  <option value="TO">TO</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              id="salvar-chamado"
+              class="button button-primary"
+            >
+              Salvar chamado
+            </button>
+
+            <button
+              type="button"
+              id="cancelar-edicao"
+              class="button button-secondary"
+              hidden
+            >
+              Cancelar edição
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="titulo-listagem">
+        <div class="panel-heading list-heading">
+          <div>
+            <h2 id="titulo-listagem">Chamados</h2>
+            <p>Acompanhe as solicitações e atualize o atendimento.</p>
+          </div>
+
+          <button
+            type="button"
+            id="atualizar-lista"
+            class="button button-secondary"
+          >
+            Atualizar
+          </button>
+        </div>
+
+        <div class="filters">
+          <div class="field">
+            <label for="filtro-status">Filtrar por status</label>
+            <select id="filtro-status">
+              <option value="">Todos os status</option>
+              <option value="aberto">Aberto</option>
+              <option value="em_atendimento">Em atendimento</option>
+              <option value="concluido">Concluído</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="filtro-prioridade">Filtrar por prioridade</label>
+            <select id="filtro-prioridade">
+              <option value="">Todas as prioridades</option>
+              <option value="baixa">Baixa</option>
+              <option value="media">Média</option>
+              <option value="alta">Alta</option>
+            </select>
+          </div>
+        </div>
+
+        <p
+          id="estado-lista"
+          class="empty-state"
+          role="status"
+          aria-live="polite"
+        >
+          Os chamados serão exibidos após a conexão com a API.
+        </p>
+
+        <!-- Os cards e os botões de editar/excluir serão criados pelo JS -->
+        <div id="lista-chamados" class="ticket-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Suporte TI — Gestão de chamados de atendimento presencial.</p>
+    </div>
+  </footer>
+</body>
+</html>
