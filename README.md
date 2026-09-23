@@ -8,11 +8,19 @@ atendimentos e consultar o endereço do local por meio do CEP.
 
 ## Estado atual
 
-A interface está implementada e pode ser executada em container Docker.
+Interface e back-end executam em containers Docker separados.
 
-A integração completa depende da implementação e execução do back-end.
-As operações de cadastro, consulta, edição, exclusão e busca de CEP ainda
-precisam ser validadas com a API em funcionamento.
+Foram verificados manualmente o cadastro, a listagem, a edição,
+a exclusão, os filtros e os contadores pela interface.
+
+Também foi verificada a permanência de um chamado após reiniciar
+o container do back-end.
+
+A revisão final inclui os casos de erro e a execução a partir
+dos arquivos publicados.
+
+Repositório do back-end:
+https://github.com/kaiov320-prog/suporte-ti-api-MVP3
 
 ## Funcionalidades
 
@@ -27,7 +35,7 @@ precisam ser validadas com a API em funcionamento.
 - Mensagens de sucesso, erro e carregamento.
 - Layout responsivo.
 
-Os chamados serão persistidos pelo back-end no SQLite.
+Os chamados são persistidos pelo back-end no SQLite.
 A interface não utiliza armazenamento local como banco de dados.
 
 ## Tecnologias
@@ -83,7 +91,7 @@ suporte-ti-interface/
 - Navegador atualizado.
 - Porta 8080 disponível.
 - Acesso à internet para obter a imagem base do Docker.
-- Back-end disponível na porta 5000 para as operações integradas.
+- Back-end disponível na porta 5001 para as operações integradas.
 
 As instruções abaixo consideram o Docker Desktop no macOS.
 
@@ -168,7 +176,7 @@ A URL base utilizada pelo JavaScript é `/api`.
 No arquivo `nginx.conf`, o destino das requisições é:
 
 ```text
-http://host.docker.internal:5000
+http://host.docker.internal:5001
 ```
 
 No Docker Desktop, esse endereço permite acessar um serviço disponível
