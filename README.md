@@ -16,8 +16,8 @@ a exclusão, os filtros e os contadores pela interface.
 Também foi verificada a permanência de um chamado após reiniciar
 o container do back-end.
 
-A revisão final inclui os casos de erro e a execução a partir
-dos arquivos publicados.
+Os casos de erro e a execução a partir dos arquivos publicados
+foram verificados conforme a seção “Validação da versão publicada”.
 
 Repositório do back-end:
 https://github.com/kaiov320-prog/suporte-ti-api-MVP3
@@ -281,3 +281,27 @@ ou gerenciamento de permissões.
 Abrir o `index.html` diretamente permite conferir o visual.
 Para utilizar a integração, acesse a interface pelo servidor
 em `http://localhost:8080`.
+
+## Validação da versão publicada
+
+Em 22/09/2026, os dois repositórios foram baixados do GitHub
+em formato ZIP e executados em containers separados, usando
+um banco de dados novo.
+
+Foram verificados com sucesso:
+
+- Construção e inicialização das imagens Docker.
+- Comunicação entre interface e API.
+- Consulta de endereço pelo ViaCEP.
+- Cadastro, listagem, edição e exclusão de chamados.
+- Permanência da alteração após recarregar a página.
+
+Durante o desenvolvimento, também foram verificados:
+
+- Filtros e contadores da interface.
+- Validação de campos obrigatórios.
+- Tratamento de CEP incompleto e inexistente.
+- Recuperação após indisponibilidade do back-end.
+- Persistência dos dados após reiniciar o container da API.
+
+Os testes foram realizados manualmente no macOS com Docker Desktop.
